@@ -2,8 +2,9 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Geburtstagsliste (Dark Mode)</title>
+  <link rel="manifest" href="manifest.json" />
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -12,6 +13,7 @@
       max-width: 700px;
       margin: 3rem auto;
       padding: 1rem;
+      box-sizing: border-box;
     }
 
     h1 {
@@ -70,6 +72,7 @@
       resize: vertical;
       background-color: #1e1e1e;
       color: #f0f0f0;
+      box-sizing: border-box;
     }
 
     #copyBtn {
@@ -122,6 +125,58 @@
     footer a:hover {
       text-decoration: underline;
     }
+
+    /* Responsive für kleine Bildschirme */
+    @media (max-width: 480px) {
+      body {
+        max-width: 95vw;
+        margin: 2rem auto;
+        padding: 1rem 0.5rem;
+      }
+
+      .controls {
+        gap: 0.5rem;
+      }
+
+      .controls button,
+      .controls input[type="date"] {
+        font-size: 0.9rem;
+        padding: 0.4rem 1rem;
+      }
+
+      textarea {
+        height: 140px;
+        font-size: 0.95rem;
+      }
+
+      #copyBtn {
+        font-size: 1rem;
+        padding: 0.5rem 1.2rem;
+      }
+    }
+
+    /* Button für Add to Home Screen */
+    #a2hsBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.4rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      display: none;
+      z-index: 1000;
+      user-select: none;
+    }
+
+    #a2hsBtn:hover {
+      background-color: #1769aa;
+    }
   </style>
 </head>
 <body>
@@ -143,6 +198,9 @@
     <div id="rangeInfo"><strong>Woche:</strong> wird geladen...</div>
     <div id="dateInfo">Letzter Montag: — | Nächster Sonntag: —</div>
   </div>
+
+  <!-- Add to Home Screen Button -->
+  <button id="a2hsBtn">Zur Startseite hinzufügen</button>
 
   <footer>
     GitHub: <a href="https://github.com/levifrsn63" target="_blank">levifrsn63</a>
@@ -169,7 +227,10 @@
     }
 
     function parseBirthdayToDate(birthdayStr, year) {
-      const [day, month] = birthdayStr.split('.').map(Number);
+      const parts = birthdayStr.split('.');
+      if (parts.length !== 2) return null;
+      const [day, month] = parts.map(Number);
+      if (isNaN(day) || isNaN(month)) return null;
       return new Date(year, month - 1, day);
     }
 
@@ -185,6 +246,8 @@
     function filterBirthdays(birthdays, monday, sunday) {
       return birthdays.filter(({ birthday }) => {
         let bd = parseBirthdayToDate(birthday, monday.getFullYear());
+        if (!bd) return false;
+        // Wenn Geburtstag vor Montag liegt, nächstes Jahr nehmen (für Jahreswechsel)
         if (bd < monday) {
           bd = parseBirthdayToDate(birthday, monday.getFullYear() + 1);
         }
@@ -263,6 +326,39 @@
         console.error('Kopieren fehlgeschlagen:', err);
       }
     });
+
+    // Add to Home Screen (A2HS) PWA Support
+    let deferredPrompt;
+    const a2hsBtn = document.getElementById('a2hsBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Verhindere, dass der Browser das Prompt automatisch zeigt
+      e.preventDefault();
+      deferredPrompt = e;
+      a2hsBtn.style.display = 'block';
+    });
+
+    a2hsBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User akzeptierte Installation');
+      } else {
+        console.log('User lehnte Installation ab');
+      }
+      deferredPrompt = null;
+      a2hsBtn.style.display = 'none';
+    });
+
+    // Service Worker Registrierung für PWA (optional, aber empfohlen)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service Worker registriert:', reg.scope))
+          .catch(err => console.error('Service Worker Fehler:', err));
+      });
+    }
 
     // Initialisierung
     syncCalendarInput();
