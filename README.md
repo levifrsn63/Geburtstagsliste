@@ -1,5 +1,14 @@
 # Geburtstagsliste für EFG Niedernberg
 
+
+## Nutzung
+
+Das Projekt eignet sich ideal für den Einsatz in der Gemeinde der **EFG Niedernberg**, um Geburtstage der Gemeindemitglieder übersichtlich darzustellen und schnell kopieren zu können.
+
+Der Dienst ist außerdem unter folgender URL öffentlich zugänglich:  
+[https://levifrsn63.github.io/Geburtstagsliste/](https://levifrsn63.github.io/Geburtstagsliste/)
+
+
 ## Beschreibung
 
 Dieses kleine Webprojekt zeigt alle Geburtstage der aktuellen Woche an, also von letztem Montag bis diesem Sonntag. 
@@ -11,19 +20,12 @@ Dieses kleine Webprojekt zeigt alle Geburtstage der aktuellen Woche an, also von
 - Über einen Button können die angezeigten Namen in die Zwischenablage kopiert werden.
 - Die Benutzeroberfläche ist einfach und übersichtlich gestaltet.
 
-## Nutzung
-
-Das Projekt eignet sich ideal für den Einsatz in der Gemeinde der **EFG Niedernberg**, um Geburtstage der Gemeindemitglieder übersichtlich darzustellen und schnell kopieren zu können.
 
 ## Voraussetzungen
 
 - Die Datei `data.json` muss die Geburtstage im Format 
   ```json
-
-
-
-
   [
-    { "name": "Max Maximilian", "birthday": "01.01" },
-    { "name": "Sam Samman", "birthday": "15.07" }
+    { "name": "Max Mustermann", "birthday": "01.01" },
+    { "name": "Erika Musterfrau", "birthday": "15.07" }
   ]
