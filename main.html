@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Geburtstage der letzten Woche</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+  textarea {
+    width: 100%;
+    height: 180px;
+    font-size: 1rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    resize: vertical;
+  }
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  #dateInfo {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #888;
+  }
+</style>
+</head>
+<body>
+
+<h2>Geburtstage von letztem Montag bis diesen Sonntag</h2>
+
+<textarea id="birthdayNames" readonly>Keine Geburtstage geladen.</textarea>
+<br />
+<button id="copyBtn">Namen kopieren</button>
+
+<div id="dateInfo">Lade Daten...</div>
+
+<footer>GitHub: <a href="https://github.com/levifrsn63" target="_blank" rel="noopener noreferrer">levifrsn63</a></footer>
+
+<script>
+  // Hilfsfunktionen um letzten Montag und diesen Sonntag zu ermitteln
+  function getLastMonday(date) {
+    const day = date.getDay(); // Sonntag=0, Montag=1
+    const diff = day === 0 ? 6 : day - 1;
+    const lastMonday = new Date(date);
+    lastMonday.setDate(date.getDate() - diff);
+    lastMonday.setHours(0, 0, 0, 0);
+    return lastMonday;
+  }
+
+  function getThisSunday(date) {
+    const day = date.getDay();
+    const diff = day === 0 ? 0 : 7 - day;
+    const thisSunday = new Date(date);
+    thisSunday.setDate(date.getDate() + diff);
+    thisSunday.setHours(23, 59, 59, 999);
+    return thisSunday;
+  }
+
+  // "dd.mm" String in Date Objekt des aktuellen Jahres umwandeln
+  function parseBirthdayToDate(birthdayStr, year) {
+    const [day, month] = birthdayStr.split('.').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  // Filtert Geburtstage von letztem Montag bis diesen Sonntag, ohne Sortierung (ursprüngliche Reihenfolge behalten)
+  function filterBirthdays(birthdays, monday, sunday) {
+    return birthdays.filter(({ birthday }) => {
+      let bdDate = parseBirthdayToDate(birthday, monday.getFullYear());
+      // Jahrwechsel berücksichtigen (wenn Geburtstag schon war, nächstes Jahr verwenden)
+      if (bdDate < monday) {
+        bdDate = parseBirthdayToDate(birthday, monday.getFullYear() + 1);
+      }
+      return bdDate >= monday && bdDate <= sunday;
+    });
+  }
+
+  async function loadAndDisplayBirthdays() {
+    const textarea = document.getElementById('birthdayNames');
+    const dateInfo = document.getElementById('dateInfo');
+    const today = new Date();
+    const monday = getLastMonday(today);
+    const sunday = getThisSunday(today);
+
+    try {
+      const response = await fetch('data.json');
+      if (!response.ok) throw new Error('Geburtstage konnten nicht geladen werden.');
+
+      const birthdays = await response.json();
+      const filtered = filterBirthdays(birthdays, monday, sunday);
+
+      if (filtered.length === 0) {
+        textarea.value = 'Keine Geburtstage diese Woche.';
+      } else {
+        textarea.value = filtered.map(b => b.name).join('\n');
+      }
+
+      dateInfo.textContent = `Heute: ${today.toLocaleDateString('de-DE')} | Letzter Montag: ${monday.toLocaleDateString('de-DE')} | Dieser Sonntag: ${sunday.toLocaleDateString('de-DE')}`;
+
+    } catch (err) {
+      textarea.value = 'Fehler beim Laden der Geburtstage.';
+      dateInfo.textContent = '';
+      console.error(err);
+    }
+  }
+
+  // Kopieren Button Funktionalität
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const textarea = document.getElementById('birthdayNames');
+    if (!textarea.value || textarea.value === 'Keine Geburtstage diese Woche.' || textarea.value === 'Fehler beim Laden der Geburtstage.') return;
+
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // für mobile Geräte
+    document.execCommand('copy');
+
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Kopiert!';
+    setTimeout(() => {
+      btn.textContent = 'Namen kopieren';
+    }, 2000);
+  });
+
+  loadAndDisplayBirthdays();
+</script>
+
+</body>
+</html>
