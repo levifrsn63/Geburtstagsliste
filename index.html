@@ -5,35 +5,91 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Geburtstage der letzten Woche</title>
 <style>
+  /* Reset & base */
   body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9fafb;
+    color: #333;
     max-width: 600px;
-    margin: 2rem auto;
-    padding: 1rem;
+    margin: 3rem auto;
+    padding: 1rem 1.5rem;
+    user-select: none;
+  }
+  h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    user-select: text;
   }
   textarea {
     width: 100%;
     height: 180px;
+    padding: 0.8rem 1rem;
     font-size: 1rem;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.05);
     resize: vertical;
+    transition: border-color 0.3s ease;
+    user-select: text;
+  }
+  textarea:focus {
+    border-color: #3498db;
+    outline: none;
   }
   button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+    margin-top: 0.6rem;
+    padding: 0.55rem 1.2rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: white;
+    background: #3498db;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
+    box-shadow: 0 5px 12px rgb(52 152 219 / 0.4);
+    transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+    user-select: none;
+    display: block;
+    width: 100%;
+    max-width: 240px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  button:hover {
+    background: #2980b9;
+    box-shadow: 0 8px 18px rgb(41 128 185 / 0.6);
+    transform: translateY(-2px);
+  }
+  button:active {
+    background: #1c5985;
+    box-shadow: none;
+    transform: translateY(0);
   }
   #dateInfo {
-    margin-top: 1rem;
+    margin-top: 1.4rem;
     font-size: 0.9rem;
-    color: #555;
+    color: #666;
+    text-align: center;
+    user-select: none;
   }
   footer {
-    margin-top: 2rem;
+    margin-top: 3rem;
     text-align: center;
     font-size: 0.85rem;
-    color: #888;
+    color: #999;
+    user-select: none;
+  }
+  footer a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  footer a:hover {
+    color: #2980b9;
+    text-decoration: underline;
   }
 </style>
 </head>
@@ -42,7 +98,6 @@
 <h2>Geburtstage von letztem Montag bis diesen Sonntag</h2>
 
 <textarea id="birthdayNames" readonly>Keine Geburtstage geladen.</textarea>
-<br />
 <button id="copyBtn">Namen kopieren</button>
 
 <div id="dateInfo">Lade Daten...</div>
@@ -50,9 +105,8 @@
 <footer>GitHub: <a href="https://github.com/levifrsn63" target="_blank" rel="noopener noreferrer">levifrsn63</a></footer>
 
 <script>
-  // Hilfsfunktionen um letzten Montag und diesen Sonntag zu ermitteln
   function getLastMonday(date) {
-    const day = date.getDay(); // Sonntag=0, Montag=1
+    const day = date.getDay();
     const diff = day === 0 ? 6 : day - 1;
     const lastMonday = new Date(date);
     lastMonday.setDate(date.getDate() - diff);
@@ -69,17 +123,14 @@
     return thisSunday;
   }
 
-  // "dd.mm" String in Date Objekt des aktuellen Jahres umwandeln
   function parseBirthdayToDate(birthdayStr, year) {
     const [day, month] = birthdayStr.split('.').map(Number);
     return new Date(year, month - 1, day);
   }
 
-  // Filtert Geburtstage von letztem Montag bis diesen Sonntag, ohne Sortierung (ursprüngliche Reihenfolge behalten)
   function filterBirthdays(birthdays, monday, sunday) {
     return birthdays.filter(({ birthday }) => {
       let bdDate = parseBirthdayToDate(birthday, monday.getFullYear());
-      // Jahrwechsel berücksichtigen (wenn Geburtstag schon war, nächstes Jahr verwenden)
       if (bdDate < monday) {
         bdDate = parseBirthdayToDate(birthday, monday.getFullYear() + 1);
       }
@@ -116,13 +167,12 @@
     }
   }
 
-  // Kopieren Button Funktionalität
   document.getElementById('copyBtn').addEventListener('click', () => {
     const textarea = document.getElementById('birthdayNames');
     if (!textarea.value || textarea.value === 'Keine Geburtstage diese Woche.' || textarea.value === 'Fehler beim Laden der Geburtstage.') return;
 
     textarea.select();
-    textarea.setSelectionRange(0, 99999); // für mobile Geräte
+    textarea.setSelectionRange(0, 99999);
     document.execCommand('copy');
 
     const btn = document.getElementById('copyBtn');
