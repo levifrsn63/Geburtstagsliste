@@ -1,189 +1,272 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Geburtstage der letzten Woche</title>
-<style>
-  /* Reset & base */
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f9fafb;
-    color: #333;
-    max-width: 600px;
-    margin: 3rem auto;
-    padding: 1rem 1.5rem;
-    user-select: none;
-  }
-  h2 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 1rem;
-    user-select: text;
-  }
-  textarea {
-    width: 100%;
-    height: 180px;
-    padding: 0.8rem 1rem;
-    font-size: 1rem;
-    line-height: 1.4;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.05);
-    resize: vertical;
-    transition: border-color 0.3s ease;
-    user-select: text;
-  }
-  textarea:focus {
-    border-color: #3498db;
-    outline: none;
-  }
-  button {
-    margin-top: 0.6rem;
-    padding: 0.55rem 1.2rem;
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: white;
-    background: #3498db;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 5px 12px rgb(52 152 219 / 0.4);
-    transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
-    user-select: none;
-    display: block;
-    width: 100%;
-    max-width: 240px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  button:hover {
-    background: #2980b9;
-    box-shadow: 0 8px 18px rgb(41 128 185 / 0.6);
-    transform: translateY(-2px);
-  }
-  button:active {
-    background: #1c5985;
-    box-shadow: none;
-    transform: translateY(0);
-  }
-  #dateInfo {
-    margin-top: 1.4rem;
-    font-size: 0.9rem;
-    color: #666;
-    text-align: center;
-    user-select: none;
-  }
-  footer {
-    margin-top: 3rem;
-    text-align: center;
-    font-size: 0.85rem;
-    color: #999;
-    user-select: none;
-  }
-  footer a {
-    color: #3498db;
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-  footer a:hover {
-    color: #2980b9;
-    text-decoration: underline;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geburtstagsliste (Dark Mode)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
+      max-width: 700px;
+      margin: 3rem auto;
+      padding: 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    p.description {
+      text-align: center;
+      color: #bbbbbb;
+      margin-bottom: 2rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .controls button,
+    .controls input[type="date"] {
+      padding: 0.5rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .controls button {
+      background: #1e88e5;
+      color: white;
+    }
+
+    .controls button:hover {
+      background: #1565c0;
+    }
+
+    .controls input[type="date"] {
+      background-color: #1c1c1c;
+      border: 2px solid #333;
+      color: #ffffff;
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 2px solid #333;
+      border-radius: 8px;
+      resize: vertical;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+    }
+
+    #copyBtn {
+      margin: 0.8rem auto;
+      display: block;
+      padding: 0.6rem 1.4rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      background-color: #43a047;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #copyBtn:hover {
+      background-color: #2e7d32;
+    }
+
+    .week-info {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: #dddddd;
+    }
+
+    .week-info strong {
+      color: #90caf9;
+    }
+
+    #dateRangeDisplay {
+      text-align: center;
+      margin-top: 0.5rem;
+      color: #ccc;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    footer a {
+      color: #64b5f6;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
 
-<h2>Geburtstagsliste</h2>
+  <h1>Geburtstagsliste</h1>
+  <p class="description">Wähle eine Woche aus, um die Geburtstage zu sehen.</p>
 
-<textarea id="birthdayNames" readonly>Keine Geburtstage geladen.</textarea>
-<button id="copyBtn">Namen kopieren</button>
+  <div class="controls">
+    <button id="prevWeekBtn">← Vorherige Woche</button>
+    <input type="date" id="calendarPicker" />
+    <button id="nextWeekBtn">Nächste Woche →</button>
+  </div>
 
-<div id="dateInfo">Lade Daten...</div>
+  <textarea id="birthdayNames" readonly>Keine Geburtstage geladen.</textarea>
+  <div id="dateRangeDisplay"></div>
+  <button id="copyBtn">Namen kopieren</button>
 
-<footer>GitHub: <a href="https://github.com/levifrsn63" target="_blank" rel="noopener noreferrer">levifrsn63</a></footer>
+  <div class="week-info">
+    <div id="rangeInfo"><strong>Woche:</strong> wird geladen...</div>
+    <div id="dateInfo">Letzter Montag: — | Nächster Sonntag: —</div>
+  </div>
 
-<script>
-  function getLastMonday(date) {
-    const day = date.getDay();
-    const diff = day === 0 ? 6 : day - 1;
-    const lastMonday = new Date(date);
-    lastMonday.setDate(date.getDate() - diff);
-    lastMonday.setHours(0, 0, 0, 0);
-    return lastMonday;
-  }
+  <footer>
+    GitHub: <a href="https://github.com/levifrsn63" target="_blank">levifrsn63</a>
+  </footer>
 
-  function getThisSunday(date) {
-    const day = date.getDay();
-    const diff = day === 0 ? 0 : 7 - day;
-    const thisSunday = new Date(date);
-    thisSunday.setDate(date.getDate() + diff);
-    thisSunday.setHours(23, 59, 59, 999);
-    return thisSunday;
-  }
+  <script>
+    let selectedDate = new Date();
 
-  function parseBirthdayToDate(birthdayStr, year) {
-    const [day, month] = birthdayStr.split('.').map(Number);
-    return new Date(year, month - 1, day);
-  }
-
-  function filterBirthdays(birthdays, monday, sunday) {
-    return birthdays.filter(({ birthday }) => {
-      let bdDate = parseBirthdayToDate(birthday, monday.getFullYear());
-      if (bdDate < monday) {
-        bdDate = parseBirthdayToDate(birthday, monday.getFullYear() + 1);
-      }
-      return bdDate >= monday && bdDate <= sunday;
-    });
-  }
-
-  async function loadAndDisplayBirthdays() {
-    const textarea = document.getElementById('birthdayNames');
-    const dateInfo = document.getElementById('dateInfo');
-    const today = new Date();
-    const monday = getLastMonday(today);
-    const sunday = getThisSunday(today);
-
-    try {
-      const response = await fetch('data.json');
-      if (!response.ok) throw new Error('Geburtstage konnten nicht geladen werden.');
-
-      const birthdays = await response.json();
-      const filtered = filterBirthdays(birthdays, monday, sunday);
-
-      if (filtered.length === 0) {
-        textarea.value = 'Keine Geburtstage diese Woche.';
-      } else {
-        textarea.value = filtered.map(b => b.name).join('\n');
-      }
-
-      dateInfo.textContent = `Heute: ${today.toLocaleDateString('de-DE')} | Letzter Montag: ${monday.toLocaleDateString('de-DE')} | Dieser Sonntag: ${sunday.toLocaleDateString('de-DE')}`;
-
-    } catch (err) {
-      textarea.value = 'Fehler beim Laden der Geburtstage.';
-      dateInfo.textContent = '';
-      console.error(err);
+    function getLastMonday(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = day === 0 ? 6 : day - 1;
+      d.setDate(d.getDate() - diff);
+      d.setHours(0, 0, 0, 0);
+      return d;
     }
-  }
 
-  document.getElementById('copyBtn').addEventListener('click', () => {
-    const textarea = document.getElementById('birthdayNames');
-    if (!textarea.value || textarea.value === 'Keine Geburtstage diese Woche.' || textarea.value === 'Fehler beim Laden der Geburtstage.') return;
+    function getWeekRange(date = new Date()) {
+      const monday = getLastMonday(date);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23, 59, 59, 999);
+      return { monday, sunday };
+    }
 
-    textarea.select();
-    textarea.setSelectionRange(0, 99999);
-    document.execCommand('copy');
+    function parseBirthdayToDate(birthdayStr, year) {
+      const [day, month] = birthdayStr.split('.').map(Number);
+      return new Date(year, month - 1, day);
+    }
 
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = 'Kopiert!';
-    setTimeout(() => {
-      btn.textContent = 'Namen kopieren';
-    }, 2000);
-  });
+    function formatDate(date) {
+      return date.toLocaleDateString('de-DE', {
+        weekday: 'long',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    }
 
-  loadAndDisplayBirthdays();
-</script>
+    function filterBirthdays(birthdays, monday, sunday) {
+      return birthdays.filter(({ birthday }) => {
+        let bd = parseBirthdayToDate(birthday, monday.getFullYear());
+        if (bd < monday) {
+          bd = parseBirthdayToDate(birthday, monday.getFullYear() + 1);
+        }
+        return bd >= monday && bd <= sunday;
+      });
+    }
 
+    async function loadBirthdays(date = new Date()) {
+      const { monday, sunday } = getWeekRange(date);
+      const textarea = document.getElementById('birthdayNames');
+      const rangeInfo = document.getElementById('rangeInfo');
+      const dateInfo = document.getElementById('dateInfo');
+      const dateRangeDisplay = document.getElementById('dateRangeDisplay');
+
+      try {
+        const response = await fetch('data.json');
+        if (!response.ok) throw new Error('Daten konnten nicht geladen werden.');
+        const birthdays = await response.json();
+
+        const filtered = filterBirthdays(birthdays, monday, sunday);
+
+        if (filtered.length === 0) {
+          textarea.value = 'Keine Geburtstage in dieser Woche.';
+        } else {
+          textarea.value = filtered.map(b => b.name).join('\n');
+        }
+
+        rangeInfo.innerHTML = `<strong>Woche:</strong> ${formatDate(monday)} – ${formatDate(sunday)}`;
+        dateInfo.textContent = `Letzter Montag: ${formatDate(monday)} | Nächster Sonntag: ${formatDate(sunday)}`;
+
+        dateRangeDisplay.textContent = `Aktuelles Datum: ${formatDate(new Date())} | Letzter Montag: ${formatDate(monday)} | Nächster Sonntag: ${formatDate(sunday)}`;
+      } catch (err) {
+        textarea.value = 'Fehler beim Laden der Geburtstage.';
+        rangeInfo.textContent = '';
+        dateInfo.textContent = '';
+        dateRangeDisplay.textContent = '';
+        console.error(err);
+      }
+    }
+
+    function syncCalendarInput() {
+      const input = document.getElementById('calendarPicker');
+      input.value = selectedDate.toISOString().split('T')[0];
+    }
+
+    document.getElementById('prevWeekBtn').addEventListener('click', () => {
+      selectedDate.setDate(selectedDate.getDate() - 7);
+      syncCalendarInput();
+      loadBirthdays(selectedDate);
+    });
+
+    document.getElementById('nextWeekBtn').addEventListener('click', () => {
+      selectedDate.setDate(selectedDate.getDate() + 7);
+      syncCalendarInput();
+      loadBirthdays(selectedDate);
+    });
+
+    document.getElementById('calendarPicker').addEventListener('change', (e) => {
+      const picked = new Date(e.target.value);
+      if (!isNaN(picked)) {
+        selectedDate = picked;
+        loadBirthdays(picked);
+      }
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const text = document.getElementById('birthdayNames').value;
+      if (!text || text.startsWith('Keine') || text.startsWith('Fehler')) return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Kopiert!';
+        setTimeout(() => btn.textContent = 'Namen kopieren', 2000);
+      } catch (err) {
+        console.error('Kopieren fehlgeschlagen:', err);
+      }
+    });
+
+    // Initialisierung
+    syncCalendarInput();
+    loadBirthdays(selectedDate);
+  </script>
 </body>
 </html>
